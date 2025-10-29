@@ -58,7 +58,7 @@ class NasaService {
         )
       };
 
-      // Додаємо параметри
+      
       Object.entries(properties.parameter).forEach(([paramName, paramData]) => {
         const value = paramData[dateStr];
         if (value !== undefined && value !== null) {
