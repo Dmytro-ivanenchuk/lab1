@@ -1,7 +1,6 @@
 import NasaData from '../models/NasaData.js';
 import nasaService from '../services/nasaService.js';
 
-// Синхронізація даних для кількох міст
 export const syncNasaData = async (req, res) => {
   try {
     const cities = [
@@ -57,7 +56,6 @@ export const syncNasaData = async (req, res) => {
   }
 };
 
-// Отримати всі дані
 export const getAllData = async (req, res) => {
   try {
     const data = await NasaData.find();
@@ -74,7 +72,6 @@ export const getAllData = async (req, res) => {
   }
 };
 
-// Отримати дані за ID
 export const getDataById = async (req, res) => {
   try {
     const data = await NasaData.findById(req.params.id);
@@ -96,7 +93,6 @@ export const getDataById = async (req, res) => {
   }
 };
 
-// Створити новий запис (вручну)
 export const createData = async (req, res) => {
   try {
     const newRecord = new NasaData(req.body);
@@ -113,7 +109,7 @@ export const createData = async (req, res) => {
   }
 };
 
-// Оновити запис
+
 export const updateData = async (req, res) => {
   try {
     const data = await NasaData.findByIdAndUpdate(
@@ -139,7 +135,7 @@ export const updateData = async (req, res) => {
   }
 };
 
-// Видалити запис
+
 export const deleteData = async (req, res) => {
   try {
     const data = await NasaData.findByIdAndDelete(req.params.id);
