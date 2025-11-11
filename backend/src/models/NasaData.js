@@ -22,9 +22,6 @@ const NasaDataSchema = new mongoose.Schema({
   temperature: Number,
   humidity: Number,
   precipitation: Number,
-  solar_radiation: Number,
-  wind_speed: Number,
-  pressure: Number,
   source: {
     type: String,
     default: 'nasa_power'
