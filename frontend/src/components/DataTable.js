@@ -18,7 +18,7 @@ const DataTableContainer = () => {
     serverStatus,
     setError,
     setSuccess,
-    setLoading, // ДОДАВ ЦЕ
+    setLoading, 
     loadData,
     handleSync
   } = useDataTable();
@@ -33,7 +33,7 @@ const DataTableContainer = () => {
     handleSave,
     handleCancel,
     handleInputChange
-  } = useDataForm(loadData, setSuccess, setError, setLoading); // Тепер setLoading доступний
+  } = useDataForm(loadData, setSuccess, setError, setLoading); 
 
   return (
     <div className="data-table-container">

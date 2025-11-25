@@ -70,7 +70,7 @@ export const useDataTable = () => {
     serverStatus,
     setError,
     setSuccess,
-    setLoading, // ДОДАВ ЦЕ
+    setLoading, 
     loadData,
     handleSync
   };

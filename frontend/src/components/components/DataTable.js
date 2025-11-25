@@ -1,6 +1,3 @@
-import React from 'react';
-
-// Допоміжні функції форматування
 const formatDate = (dateString) => {
   try {
     return new Date(dateString).toLocaleDateString('uk-UA', {

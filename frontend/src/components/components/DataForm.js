@@ -1,5 +1,3 @@
-import React from 'react';
-
 const DataForm = ({ isCreating, editingId, formData, onInputChange, onSave, onCancel, loading }) => {
   if (!isCreating && !editingId) return null;
 

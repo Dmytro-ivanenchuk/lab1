@@ -1,5 +1,3 @@
-import React from 'react';
-
 const formatDate = (dateString) => {
   try {
     return new Date(dateString).toLocaleDateString('uk-UA', {
