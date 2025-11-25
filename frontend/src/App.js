@@ -1,11 +1,11 @@
 import React from 'react';
-import DataTable from './components/DataTable';
-import './App.css';
+import DataTableContainer from './components/DataTableContainer';
+import './styles/DataTable.css';
 
 function App() {
   return (
     <div className="App">
-      <DataTable />
+      <DataTableContainer />
     </div>
   );
 }
