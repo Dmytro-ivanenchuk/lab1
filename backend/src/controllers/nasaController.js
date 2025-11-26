@@ -58,7 +58,7 @@ export const syncNasaData = async (req, res) => {
 
 export const getAllData = async (req, res) => {
   try {
-    const data = await NasaData.find();
+    const data = await NasaData.find().sort({ date: -1, location: 1 });
     res.json({
       success: true,
       count: data.length,
@@ -95,13 +95,39 @@ export const getDataById = async (req, res) => {
 
 export const createData = async (req, res) => {
   try {
-    const newRecord = new NasaData(req.body);
+    // Координати за замовчуванням для українських міст
+    const cityCoordinates = {
+      'Київ': { lat: 50.4501, lng: 30.5234 },
+      'Львів': { lat: 49.8397, lng: 24.0297 },
+      'Одеса': { lat: 46.4825, lng: 30.7233 },
+      'Харків': { lat: 49.9935, lng: 36.2304 },
+      'Дніпро': { lat: 48.4647, lng: 35.0462 }
+    };
+
+    const location = req.body.location;
+    const coordinates = cityCoordinates[location] || { lat: 50.4501, lng: 30.5234 }; // Київ за замовчуванням
+
+    const recordData = {
+      location: location,
+      temperature: req.body.temperature,
+      humidity: req.body.humidity,
+      precipitation: req.body.precipitation,
+      date: req.body.date || new Date(),
+      coordinates: {
+        latitude: coordinates.lat,
+        longitude: coordinates.lng
+      }
+    };
+
+    const newRecord = new NasaData(recordData);
     await newRecord.save();
+    
     res.status(201).json({
       success: true,
       data: newRecord
     });
   } catch (error) {
+    console.error('Помилка створення запису:', error);
     res.status(400).json({
       success: false,
       message: error.message
@@ -109,20 +135,32 @@ export const createData = async (req, res) => {
   }
 };
 
-
 export const updateData = async (req, res) => {
   try {
-    const data = await NasaData.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true }
-    );
-    if (!data) {
+    // Отримуємо існуючий запис для збереження координат
+    const existingData = await NasaData.findById(req.params.id);
+    if (!existingData) {
       return res.status(404).json({
         success: false,
         message: 'Запис не знайдено'
       });
     }
+
+    const updateData = {
+      location: req.body.location,
+      temperature: req.body.temperature,
+      humidity: req.body.humidity,
+      precipitation: req.body.precipitation,
+      coordinates: existingData.coordinates,
+      date: existingData.date
+    };
+
+    const data = await NasaData.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    );
+
     res.json({
       success: true,
       data: data
@@ -134,7 +172,6 @@ export const updateData = async (req, res) => {
     });
   }
 };
-
 
 export const deleteData = async (req, res) => {
   try {

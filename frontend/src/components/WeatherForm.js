@@ -9,20 +9,19 @@ const WeatherForm = ({
   onCancel, 
   initialData,
   loading,
-  setLoading 
+  setLoading,
+  API_URL
 }) => {
-  const [formData, setFormData] = useState({ 
-    location: '', 
-    temperature: '', 
-    humidity: '', 
-    precipitation: '' 
+  const [formData, setFormData] = useState({
+    location: '',
+    temperature: '',
+    humidity: '',
+    precipitation: ''
   });
 
-  const API_URL = 'http://localhost:3001/api/nasa';
-
-  // Заповнити форму даними при редагуванні
+  // Ініціалізація форми при редагуванні
   useEffect(() => {
-    if (initialData && !isCreating) {
+    if (initialData) {
       setFormData({
         location: initialData.location || '',
         temperature: initialData.temperature || '',
@@ -30,65 +29,126 @@ const WeatherForm = ({
         precipitation: initialData.precipitation || ''
       });
     } else {
-      setFormData({ location: '', temperature: '', humidity: '', precipitation: '' });
+      setFormData({
+        location: '',
+        temperature: '',
+        humidity: '',
+        precipitation: ''
+      });
     }
-  }, [initialData, isCreating]);
+  }, [initialData]);
 
-  // Зберегти форму
-  const handleSave = async () => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Валідація
+    if (!formData.location || !formData.temperature || !formData.humidity || !formData.precipitation) {
+      onSaveError('Всі поля обов\'язкові для заповнення');
+      return;
+    }
+
     try {
       setLoading(true);
+      
+      const dataToSend = {
+        location: formData.location,
+        temperature: parseFloat(formData.temperature),
+        humidity: parseFloat(formData.humidity),
+        precipitation: parseFloat(formData.precipitation)
+      };
+
+      let response;
       if (isCreating) {
-        await axios.post(`${API_URL}/data`, {
-          ...formData,
-          date: new Date().toISOString()
-        });
+        response = await axios.post(`${API_URL}/data`, dataToSend);
       } else {
-        await axios.put(`${API_URL}/data/${editingId}`, formData);
+        response = await axios.put(`${API_URL}/data/${editingId}`, dataToSend);
       }
-      onSaveSuccess();
+
+      if (response.data.success) {
+        onSaveSuccess();
+      } else {
+        onSaveError(response.data.message || 'Невідома помилка');
+      }
     } catch (err) {
-      onSaveError();
+      console.error('Помилка збереження:', err);
+      onSaveError(err.response?.data?.message || err.message || 'Помилка збереження');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="form-panel">
-      <h3>{isCreating ? 'Створення запису' : 'Редагування запису'}</h3>
-      <div className="form-grid">
-        <input
-          type="text"
-          placeholder="Місто"
-          value={formData.location}
-          onChange={(e) => setFormData({...formData, location: e.target.value})}
-        />
-        <input
-          type="number"
-          placeholder="Температура (°C)"
-          value={formData.temperature}
-          onChange={(e) => setFormData({...formData, temperature: e.target.value})}
-        />
-        <input
-          type="number"
-          placeholder="Вологість (%)"
-          value={formData.humidity}
-          onChange={(e) => setFormData({...formData, humidity: e.target.value})}
-        />
-        <input
-          type="number"
-          placeholder="Опади (mm)"
-          value={formData.precipitation}
-          onChange={(e) => setFormData({...formData, precipitation: e.target.value})}
-        />
-      </div>
-      <div className="form-actions">
-        <button onClick={handleSave} disabled={loading}>
-          {loading ? 'Збереження...' : 'Зберегти'}
-        </button>
-        <button onClick={onCancel}>Скасувати</button>
-      </div>
+    <div className="weather-form">
+      <h3>{isCreating ? 'Додати запис' : 'Редагувати запис'}</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Місто:</label>
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleInputChange}
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label>Температура (°C):</label>
+          <input
+            type="number"
+            step="0.1"
+            name="temperature"
+            value={formData.temperature}
+            onChange={handleInputChange}
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label>Вологість (%):</label>
+          <input
+            type="number"
+            step="0.1"
+            name="humidity"
+            value={formData.humidity}
+            onChange={handleInputChange}
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-group">
+          <label>Опади (mm):</label>
+          <input
+            type="number"
+            step="0.1"
+            name="precipitation"
+            value={formData.precipitation}
+            onChange={handleInputChange}
+            required
+            disabled={loading}
+          />
+        </div>
+        
+        <div className="form-actions">
+          <button type="submit" disabled={loading} className="btn-primary">
+            {loading ? 'Збереження...' : (isCreating ? 'Створити' : 'Оновити')}
+          </button>
+          <button type="button" onClick={onCancel} disabled={loading} className="btn-secondary">
+            Скасувати
+          </button>
+        </div>
+      </form>
     </div>
   );
 };

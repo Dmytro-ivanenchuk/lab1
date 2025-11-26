@@ -5,11 +5,13 @@ import '../styles/DataTable.css';
 
 const DataTableContainer = () => {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [isCreating, setIsCreating] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const API_URL = 'http://localhost:3000/api/nasa';
 
@@ -19,12 +21,25 @@ const DataTableContainer = () => {
       setLoading(true);
       const response = await axios.get(`${API_URL}/data`);
       setData(response.data.data || []);
+      setFilteredData(response.data.data || []);
     } catch (err) {
-      setError('Помилка завантаження даних');
+      setError('Помилка завантаження даних: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
     }
   };
+
+  // Пошук за містом
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredData(data);
+    } else {
+      const filtered = data.filter(item => 
+        item.location && item.location.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredData(filtered);
+    }
+  }, [searchTerm, data]);
 
   // Синхронізація з NASA
   const handleSync = async () => {
@@ -34,7 +49,7 @@ const DataTableContainer = () => {
       setSuccess(response.data.message);
       setTimeout(loadData, 2000);
     } catch (err) {
-      setError('Помилка синхронізації');
+      setError('Помилка синхронізації: ' + (err.response?.data?.message || err.message));
       setLoading(false);
     }
   };
@@ -48,7 +63,7 @@ const DataTableContainer = () => {
         setSuccess('Запис видалено');
         await loadData();
       } catch (err) {
-        setError('Помилка видалення');
+        setError('Помилка видалення: ' + (err.response?.data?.message || err.message));
       } finally {
         setLoading(false);
       }
@@ -61,8 +76,8 @@ const DataTableContainer = () => {
     loadData();
   };
 
-  const handleFormError = () => {
-    setError('Помилка збереження');
+  const handleFormError = (errorMessage) => {
+    setError('Помилка збереження: ' + errorMessage);
   };
 
   const resetForm = () => {
@@ -86,7 +101,7 @@ const DataTableContainer = () => {
         <h1>🌍 Система моніторингу NASA POWER</h1>
       </div>
 
-      {/* Кнопки управління */}
+      {/* Кнопки управління та пошук */}
       <div className="control-panel">
         <button onClick={handleSync} disabled={loading}>
           {loading ? 'Синхронізація...' : 'Синхронізувати з NASA'}
@@ -97,6 +112,16 @@ const DataTableContainer = () => {
         <button onClick={() => setIsCreating(true)} disabled={loading}>
           Додати запис
         </button>
+        
+        <div className="search-container">
+          <input
+            type="text"
+            placeholder="Пошук за містом..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            disabled={loading}
+          />
+        </div>
       </div>
 
       {/* Повідомлення */}
@@ -124,6 +149,7 @@ const DataTableContainer = () => {
           initialData={editingId ? data.find(item => item._id === editingId) : null}
           loading={loading}
           setLoading={setLoading}
+          API_URL={API_URL}
         />
       )}
 
@@ -141,7 +167,7 @@ const DataTableContainer = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((item) => (
+            {filteredData.map((item) => (
               <tr key={item._id}>
                 <td>{item.location}</td>
                 <td>{new Date(item.date).toLocaleDateString('uk-UA')}</td>
@@ -149,14 +175,16 @@ const DataTableContainer = () => {
                 <td>{item.humidity}%</td>
                 <td>{item.precipitation}mm</td>
                 <td>
-                  <button onClick={() => startEditing(item)}>✏️</button>
-                  <button onClick={() => handleDelete(item._id, item.location)}>🗑️</button>
+                  <button onClick={() => startEditing(item)} disabled={loading}>✏️</button>
+                  <button onClick={() => handleDelete(item._id, item.location)} disabled={loading}>🗑️</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {data.length === 0 && !loading && <p>Немає даних</p>}
+        {filteredData.length === 0 && !loading && (
+          <p>{searchTerm ? 'Немає результатів пошуку' : 'Немає даних'}</p>
+        )}
       </div>
 
       {loading && <div className="loading">Завантаження...</div>}
