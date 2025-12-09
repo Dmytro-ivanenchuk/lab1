@@ -101,7 +101,7 @@ const DataTableContainer = () => {
         <h1>🌍 Система моніторингу NASA POWER</h1>
       </div>
 
-      {/* Кнопки управління та пошук */}
+      {/* Кнопки управління*/}
       <div className="control-panel">
         <button onClick={handleSync} disabled={loading}>
           {loading ? 'Синхронізація...' : 'Синхронізувати з NASA'}
