@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import nasaRoutes from './src/routes/nasaRoutes.js';
+import anomalyRoutes from './src/routes/anomalyRoutes.js';
 
 const app = express();
 
@@ -16,5 +17,7 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
+
+app.use('/api/anomaly', anomalyRoutes);
 
 export default app;
