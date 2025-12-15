@@ -21,7 +21,6 @@ const AnomalyDataSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  // Результати аналізу
   isAnomaly: {
     type: Boolean,
     default: false

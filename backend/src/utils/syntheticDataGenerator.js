@@ -29,24 +29,19 @@ const generateSyntheticData = (params = {}) => {
   currentTime.setHours(0, 0, 0, 0);
   currentTime.setDate(currentTime.getDate() - days);
 
-  // Генерація базового фону з добовою циклічністю
   for (let i = 0; i < totalPoints; i++) {
     const minutesOfDay = (currentTime.getHours() * 60 + currentTime.getMinutes());
     
-    // Добова циклічність: вищі значення вдень, нижчі вночі
     const dailyPattern = Math.sin((minutesOfDay - 420) * Math.PI / 720) * 0.5 + 0.5;
     
-    // Базове значення з денним паттерном
     let value = range.baseline + (dailyPattern * (range.max - range.baseline) * 0.3);
     
-    // Додаємо випадковий шум
     const noise = (Math.random() - 0.5) * range.baseline * 0.5;
     value += noise;
     
-    // Додаємо випадкові піки (гамма-розподіл)
-    if (Math.random() < 0.01) { // 1% ймовірність піку
+    if (Math.random() < 0.01) { 
       const peakIntensity = Math.random() * (range.max - value) * 0.8;
-      const peakDuration = Math.floor(Math.random() * 8) + 1; // 1-8 точок
+      const peakDuration = Math.floor(Math.random() * 8) + 1; 
       
       for (let j = 0; j < peakDuration && i + j < totalPoints; j++) {
         const decayFactor = Math.exp(-j * 0.5);

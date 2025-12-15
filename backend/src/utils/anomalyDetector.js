@@ -1,6 +1,3 @@
-/**
- * Виявлення аномалій у часових рядах забруднення
- */
 
 const detectAnomalies = (data, params = {}) => {
   const {
@@ -10,12 +7,10 @@ const detectAnomalies = (data, params = {}) => {
     measurementInterval = 15 // хвилин між вимірами
   } = params;
 
-  // Сортуємо дані за часом
   const sortedData = [...data].sort((a, b) => 
     new Date(a.timestamp) - new Date(b.timestamp)
   );
 
-  // Перевірка мінімальної кількості точок
   if (sortedData.length < 24) {
     throw new Error(`Недостатньо даних для аналізу. Мінімум 24 точки, отримано: ${sortedData.length}`);
   }
@@ -69,7 +64,7 @@ const calculateMovingStats = (data, windowSize, interval) => {
     let movingStd = null;
     let upperThreshold = null;
 
-    if (window.length >= 12) { // Мінімум 12 точок для статистики
+    if (window.length >= 12) { 
       movingAverage = calculateMean(window);
       movingStd = calculateStandardDeviation(window, movingAverage);
       upperThreshold = movingAverage + (3 * movingStd);
