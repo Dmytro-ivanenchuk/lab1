@@ -122,19 +122,18 @@ const AnomalyDetector = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings.pollutant]);
 
-  // Простий графік без Chart.js
+
   const renderSimpleChart = () => {
     if (data.length === 0) {
       return (
         <div className="no-data">
           <p>Немає даних для відображення</p>
-          <button onClick={handleGenerateData}>Згенерувати тестові дані</button>
+          <button onClick={handleGenerateData}>Згенерувати дані</button>
         </div>
       );
     }
 
-    // Підготовка даних для простого графіка
-    const recentData = data.slice(-50); // Беремо останні 50 точок
+    const recentData = data.slice(-50); 
     const maxValue = Math.max(...recentData.map(d => d.value));
     
     return (
@@ -155,7 +154,7 @@ const AnomalyDetector = () => {
                   border: isAnomaly ? '2px solid #d32f2f' : '1px solid #388e3c'
                 }}
               >
-                {isAnomaly && '⚠️'}
+                {isAnomaly}
               </div>
             );
           })}
@@ -172,11 +171,10 @@ const AnomalyDetector = () => {
   return (
     <div className="anomaly-detector">
       <div className="anomaly-header">
-        <h1>⚠️ Система виявлення аномальних викидів</h1>
+        <h1>Система виявлення аномальних викидів</h1>
         <p>Аналіз часових рядів забруднення повітря</p>
       </div>
 
-      {/* Панель керування */}
       <div className="control-panel">
         <div className="settings-grid">
           <div className="setting">
