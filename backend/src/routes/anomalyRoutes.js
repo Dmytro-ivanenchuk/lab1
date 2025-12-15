@@ -9,19 +9,10 @@ import {
 
 const router = express.Router();
 
-// Аналіз даних на наявність аномалій
 router.post('/analyze', analyzeData);
-
-// Генерація синтетичних даних
 router.post('/generate', generateData);
-
-// Отримання даних
 router.get('/data', getData);
-
-// Додавання точки даних
 router.post('/data', addDataPoint);
-
-// Статистика
 router.get('/statistics', getStatistics);
 
 export default router;
